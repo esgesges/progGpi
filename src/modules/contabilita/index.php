@@ -147,12 +147,12 @@ $saldo = $totale_entrate - $totale_uscite;
         <nav>
             <div class="logo">Sistema ERP</div>
             <ul class="menu">
-                <li><a href="../../index.php">Home</a></li>
-                <li><a href="index.php">Contabilità</a></li>
-                <li><a href="../magazzino/index.php">Magazzino</a></li>
-                <li><a href="../clienti/index.php">Clienti</a></li>
-                <li><a href="../fornitori/index.php">Fornitori</a></li>
-                <li><a href="../ordini/carrello.php">Carrello</a></li>
+                <li><a href="modules/contabilita/index.php">Contabilità</a></li>
+                <li><a href="modules/magazzino/index.php">Magazzino</a></li>
+                <li><a href="modules/clienti/index.php">Clienti</a></li>
+                <li><a href="modules/fornitori/index.php">Fornitori</a></li>
+                <li><a href="modules/ordini/prodotti.php">Prodotti</a></li>
+                <li><a href="modules/ordini/carrello.php">Carrello</a></li>
             </ul>
         </nav>
     </header>
