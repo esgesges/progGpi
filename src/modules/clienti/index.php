@@ -187,9 +187,5 @@ $clienti = getClienti($conn);
             </form>
         </div>
     </main>
-
-    <footer>
-        <p>&copy; 2024 Sistema ERP. Tutti i diritti riservati.</p>
-    </footer>
 </body>
 </html>
