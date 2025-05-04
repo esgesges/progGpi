@@ -26,22 +26,22 @@
             <div class="card">
                 <h2>Contabilità</h2>
                 <p>Gestisci i movimenti contabili e monitora le finanze</p>
-                <a href="modules/contabilita/index.php" class="btn">Accedi</a>
+                <a href="modules/contabilita/index.php" class="btn">Contabilità</a>
             </div>
             <div class="card">
                 <h2>Magazzino</h2>
                 <p>Controlla le giacenze e gestisci i prodotti</p>
-                <a href="modules/magazzino/index.php" class="btn">Accedi</a>
+                <a href="modules/magazzino/index.php" class="btn">Magazzino</a>
             </div>
             <div class="card">
                 <h2>Clienti</h2>
                 <p>Gestisci l'anagrafica e le relazioni con i clienti</p>
-                <a href="modules/clienti/index.php" class="btn">Accedi</a>
+                <a href="modules/clienti/index.php" class="btn">Clienti</a>
             </div>
             <div class="card">
                 <h2>Fornitori</h2>
                 <p>Gestisci i rapporti con i fornitori</p>
-                <a href="modules/fornitori/index.php" class="btn">Accedi</a>
+                <a href="modules/fornitori/index.php" class="btn">Fornitori</a>
             </div>
         </div>
     </main>
