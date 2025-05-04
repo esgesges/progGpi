@@ -63,16 +63,6 @@ $prodotti = $stmt->fetchAll(PDO::FETCH_ASSOC);
             padding: 5px;
             margin-right: 10px;
         }
-        .cart-link {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            text-decoration: none;
-        }
     </style>
 </head>
 <body>
@@ -96,8 +86,6 @@ $prodotti = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <?php if (isset($success)): ?>
             <div class="success-message"><?php echo $success; ?></div>
         <?php endif; ?>
-
-        <a href="carrello.php" class="cart-link">Vai al Carrello</a>
 
         <div class="products-grid">
             <?php foreach ($prodotti as $prodotto): ?>

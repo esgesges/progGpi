@@ -117,15 +117,6 @@ foreach ($_SESSION['carrello'] as $item) {
             border-radius: 8px;
             margin: 20px 0;
         }
-        .continue-shopping {
-            display: inline-block;
-            padding: 10px 20px;
-            background: #4CAF50;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
     </style>
 </head>
 <body>
@@ -153,8 +144,6 @@ foreach ($_SESSION['carrello'] as $item) {
         <?php if (isset($error)): ?>
             <div class="error-message"><?php echo $error; ?></div>
         <?php endif; ?>
-
-        <a href="prodotti.php" class="continue-shopping">Continua lo Shopping</a>
 
         <div class="cart-container">
             <?php if (empty($_SESSION['carrello'])): ?>

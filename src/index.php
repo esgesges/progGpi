@@ -15,6 +15,7 @@
                 <li><a href="modules/magazzino/index.php">Magazzino</a></li>
                 <li><a href="modules/clienti/index.php">Clienti</a></li>
                 <li><a href="modules/fornitori/index.php">Fornitori</a></li>
+                <li><a href="modules/ordini/prodotti.php">Prodotti</a></li>
                 <li><a href="modules/ordini/carrello.php">Carrello</a></li>
             </ul>
         </nav>
@@ -42,6 +43,11 @@
                 <h2>Fornitori</h2>
                 <p>Gestisci i rapporti con i fornitori</p>
                 <a href="modules/fornitori/index.php" class="btn">Fornitori</a>
+            </div>
+            <div class="card">
+                <h2>Prodotti</h2>
+                <p>Gestisci ivisualizza tutti i prodotti disponibili</p>
+                <a href="modules/ordini/prodotti.php" class="btn">Prodotti</a>
             </div>
         </div>
     </main>
