@@ -49,33 +49,49 @@ $prodotti = $stmt->fetchAll(PDO::FETCH_ASSOC);
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 20px;
-            padding: 20px;
+            margin-top: 20px;
         }
         .product-card {
             background: white;
-            border: 1px solid #ddd;
-            padding: 15px;
             border-radius: 8px;
+            padding: 15px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        .quantity-input {
+        .product-card h3 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        .product-card p {
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .product-card .price {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        .add-to-cart-form {
+            display: flex;
+            gap: 10px;
+        }
+        .add-to-cart-form input[type="number"] {
             width: 60px;
-            padding: 5px;
-            margin-right: 10px;
         }
     </style>
 </head>
 <body>
     <header>
         <nav>
-            <div class="logo">Sistema ERP</div>
+            <div class="logo">
+                <img src="../../content/logo.png" alt="Logo Sistema ERP" class="logo-img">
+            </div>
             <ul class="menu">
+                <li><a href="../../index.php">Home</a></li>
                 <li><a href="../contabilita/index.php">Contabilità</a></li>
                 <li><a href="../magazzino/index.php">Magazzino</a></li>
                 <li><a href="../clienti/index.php">Clienti</a></li>
                 <li><a href="../fornitori/index.php">Fornitori</a></li>
-                <li><a href="../ordini/prodotti.php">Prodotti</a></li>
-                <li><a href="../ordini/carrello.php">Carrello</a></li>
+                <li><a href="carrello.php">Carrello</a></li>
             </ul>
         </nav>
     </header>

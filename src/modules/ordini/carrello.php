@@ -18,61 +18,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $success = "Prodotto rimosso dal carrello";
                 }
                 break;
-                
             case 'conferma':
-                if (!empty($_SESSION['carrello'])) {
-                    try {
-                        $conn->beginTransaction();
-                        
-                        // Crea l'ordine
-                        $totale = 0;
-                        foreach ($_SESSION['carrello'] as $id => $item) {
-                            $totale += $item['prezzo'] * $item['quantita'];
-                        }
-                        
-                        $stmt = $conn->prepare("INSERT INTO ordini (cliente_id, totale, stato) VALUES (:cliente_id, :totale, 'in attesa')");
-                        $stmt->execute([
-                            ':cliente_id' => $_POST['cliente_id'],
-                            ':totale' => $totale
-                        ]);
-                        
-                        $ordine_id = $conn->lastInsertId();
-                        
-                        // Inserisci i dettagli dell'ordine e aggiorna il magazzino
-                        foreach ($_SESSION['carrello'] as $id => $item) {
-                            // Inserisci dettaglio ordine
-                            $stmt = $conn->prepare("INSERT INTO dettagli_ordine (ordine_id, prodotto_id, quantita, prezzo_unitario) 
-                                                  VALUES (:ordine_id, :prodotto_id, :quantita, :prezzo)");
-                            $stmt->execute([
-                                ':ordine_id' => $ordine_id,
-                                ':prodotto_id' => $id,
-                                ':quantita' => $item['quantita'],
-                                ':prezzo' => $item['prezzo']
-                            ]);
-                            
-                            // Aggiorna quantità magazzino
-                            $stmt = $conn->prepare("UPDATE prodotti SET quantita_disponibile = quantita_disponibile - :quantita 
-                                                  WHERE id = :id");
-                            $stmt->execute([':quantita' => $item['quantita'], ':id' => $id]);
-                        }
-                        
-                        $conn->commit();
-                        $_SESSION['carrello'] = [];
-                        $success = "Ordine confermato con successo!";
-                    } catch (Exception $e) {
-                        $conn->rollBack();
-                        $error = "Errore durante la conferma dell'ordine: " . $e->getMessage();
-                    }
-                }
+                $_SESSION['carrello'] = [];
+                $success = "Ordine confermato! Il carrello è stato svuotato.";
                 break;
         }
     }
 }
-
-// Ottieni lista clienti per la selezione
-$stmt = $conn->prepare("SELECT id, nome, cognome FROM clienti");
-$stmt->execute();
-$clienti = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Calcola totale carrello
 $totale_carrello = 0;
@@ -91,30 +43,29 @@ foreach ($_SESSION['carrello'] as $item) {
     <style>
         .cart-container {
             max-width: 800px;
-            margin: 0 auto;
+            margin: 20px auto;
+            background: white;
             padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .cart-items {
+            margin-bottom: 20px;
         }
         .cart-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px;
-            margin-bottom: 10px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
         }
-        .total {
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+        .cart-total {
+            text-align: right;
             font-size: 1.2em;
             font-weight: bold;
-            margin: 20px 0;
-            text-align: right;
-        }
-        .empty-cart {
-            text-align: center;
-            padding: 40px;
-            background: white;
-            border-radius: 8px;
             margin: 20px 0;
         }
     </style>
@@ -122,14 +73,16 @@ foreach ($_SESSION['carrello'] as $item) {
 <body>
     <header>
         <nav>
-            <div class="logo">Sistema ERP</div>
+            <div class="logo">
+                <img src="../../content/logo.png" alt="Logo Sistema ERP" class="logo-img">
+            </div>
             <ul class="menu">
+                <li><a href="../../index.php">Home</a></li>
                 <li><a href="../contabilita/index.php">Contabilità</a></li>
                 <li><a href="../magazzino/index.php">Magazzino</a></li>
                 <li><a href="../clienti/index.php">Clienti</a></li>
                 <li><a href="../fornitori/index.php">Fornitori</a></li>
-                <li><a href="../ordini/prodotti.php">Prodotti</a></li>
-                <li><a href="../ordini/carrello.php">Carrello</a></li>
+                <li><a href="prodotti.php">Prodotti</a></li>
             </ul>
         </nav>
     </header>
@@ -168,25 +121,16 @@ foreach ($_SESSION['carrello'] as $item) {
                     </div>
                 <?php endforeach; ?>
 
-                <div class="total">
+                <div class="cart-total">
                     Totale: €<?php echo number_format($totale_carrello, 2); ?>
                 </div>
 
-                <form method="POST" action="carrello.php">
-                    <input type="hidden" name="action" value="conferma">
-                    <div class="form-group">
-                        <label for="cliente_id">Seleziona Cliente:</label>
-                        <select id="cliente_id" name="cliente_id" required>
-                            <option value="">Scegli un cliente</option>
-                            <?php foreach ($clienti as $cliente): ?>
-                                <option value="<?php echo $cliente['id']; ?>">
-                                    <?php echo htmlspecialchars($cliente['nome'] . ' ' . $cliente['cognome']); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn" style="width: 100%; margin-top: 10px;">Conferma Ordine</button>
-                </form>
+                <div style="text-align: center; margin-top: 20px;">
+                    <form method="POST" action="carrello.php">
+                        <input type="hidden" name="action" value="conferma">
+                        <button type="submit" class="btn" style="width: 200px;">Conferma Ordine</button>
+                    </form>
+                </div>
             <?php endif; ?>
         </div>
     </main>

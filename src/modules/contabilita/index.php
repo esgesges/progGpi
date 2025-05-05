@@ -145,9 +145,11 @@ $saldo = $totale_entrate - $totale_uscite;
 <body>
     <header>
         <nav>
-            <div class="logo">Sistema ERP</div>
+            <div class="logo">
+                <img src="../../content/logo.png" alt="Logo Sistema ERP" class="logo-img">
+            </div>
             <ul class="menu">
-                <li><a href="../contabilita/index.php">Contabilità</a></li>
+                <li><a href="../../index.php">Home</a></li>
                 <li><a href="../magazzino/index.php">Magazzino</a></li>
                 <li><a href="../clienti/index.php">Clienti</a></li>
                 <li><a href="../fornitori/index.php">Fornitori</a></li>

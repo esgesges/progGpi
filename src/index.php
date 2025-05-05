@@ -9,7 +9,9 @@
 <body>
     <header>
         <nav>
-            <div class="logo">Sistema ERP</div>
+            <div class="logo">
+                <img src="content/logo.png" alt="Logo Sistema ERP" class="logo-img">
+            </div>
             <ul class="menu">
                 <li><a href="modules/contabilita/index.php">Contabilità</a></li>
                 <li><a href="modules/magazzino/index.php">Magazzino</a></li>
@@ -22,7 +24,7 @@
     </header>
 
     <main class="container">
-        <h1>Benvenuto nel Sistema ERP</h1>
+        <h1>Dashboard</h1>
         <div class="dashboard">
             <div class="card">
                 <h2>Contabilità</h2>
