@@ -1,4 +1,9 @@
 <?php
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header("Location: ../../login.php");
+    exit();
+}
 require_once '../../database/config.php';
 
 // Funzione per ottenere tutti i clienti
@@ -12,14 +17,12 @@ function getClienti($conn) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if ($_POST['action'] === 'aggiungi') {
         try {
-            $stmt = $conn->prepare("INSERT INTO clienti (nome, cognome, email, telefono, indirizzo) 
-                                  VALUES (:nome, :cognome, :email, :telefono, :indirizzo)");
+            $stmt = $conn->prepare("INSERT INTO clienti (nome, cognome, email) 
+                                  VALUES (:nome, :cognome, :email)");
             $stmt->execute([
                 ':nome' => $_POST['nome'],
                 ':cognome' => $_POST['cognome'],
-                ':email' => $_POST['email'],
-                ':telefono' => $_POST['telefono'],
-                ':indirizzo' => $_POST['indirizzo']
+                ':email' => $_POST['email']
             ]);
             header("Location: index.php?success=1");
             exit();
@@ -105,11 +108,17 @@ $clienti = getClienti($conn);
             </div>
             <ul class="menu">
                 <li><a href="../../index.php">Home</a></li>
-                <li><a href="../contabilita/index.php">Contabilità</a></li>
-                <li><a href="../magazzino/index.php">Magazzino</a></li>
-                <li><a href="../fornitori/index.php">Fornitori</a></li>
-                <li><a href="../ordini/prodotti.php">Prodotti</a></li>
-                <li><a href="../ordini/carrello.php">Carrello</a></li>
+                <?php if ($_SESSION['role'] === 'admin'): ?>
+                    <li><a href="../contabilita/index.php">Contabilità</a></li>
+                    <li><a href="../magazzino/index.php">Magazzino</a></li>
+                    <li><a href="../clienti/index.php">Clienti</a></li>
+                    <li><a href="../fornitori/index.php">Fornitori</a></li>
+                <?php endif; ?>
+                <?php if ($_SESSION['role'] === 'user'): ?>
+                    <li><a href="../ordini/prodotti.php">Prodotti</a></li>
+                    <li><a href="../ordini/carrello.php">Carrello</a></li>
+                <?php endif; ?>
+                <li><a href="../../logout.php">Logout</a></li>
             </ul>
         </nav>
     </header>
@@ -134,21 +143,17 @@ $clienti = getClienti($conn);
                         <th>Nome</th>
                         <th>Cognome</th>
                         <th>Email</th>
-                        <th>Telefono</th>
-                        <th>Indirizzo</th>
                         <th>Data Registrazione</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($clienti as $cliente): ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($cliente['id']); ?></td>
-                        <td><?php echo htmlspecialchars($cliente['nome']); ?></td>
-                        <td><?php echo htmlspecialchars($cliente['cognome']); ?></td>
-                        <td><?php echo htmlspecialchars($cliente['email']); ?></td>
-                        <td><?php echo htmlspecialchars($cliente['telefono']); ?></td>
-                        <td><?php echo htmlspecialchars($cliente['indirizzo']); ?></td>
-                        <td><?php echo date('d/m/Y H:i', strtotime($cliente['data_registrazione'])); ?></td>
+                        <td><?php echo htmlspecialchars($cliente['id'] ?? ''); ?></td>
+                        <td><?php echo htmlspecialchars($cliente['nome'] ?? ''); ?></td>
+                        <td><?php echo htmlspecialchars($cliente['cognome'] ?? ''); ?></td>
+                        <td><?php echo htmlspecialchars($cliente['email'] ?? ''); ?></td>
+                        <td><?php echo $cliente['data_registrazione'] ? date('d/m/Y H:i', strtotime($cliente['data_registrazione'])) : ''; ?></td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -173,16 +178,6 @@ $clienti = getClienti($conn);
                 <div class="form-group">
                     <label for="email">Email:</label>
                     <input type="email" id="email" name="email" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="telefono">Telefono:</label>
-                    <input type="tel" id="telefono" name="telefono">
-                </div>
-
-                <div class="form-group">
-                    <label for="indirizzo">Indirizzo:</label>
-                    <textarea id="indirizzo" name="indirizzo" rows="3"></textarea>
                 </div>
 
                 <button type="submit" class="btn">Registra Cliente</button>

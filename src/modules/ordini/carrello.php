@@ -19,8 +19,86 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 break;
             case 'conferma':
-                $_SESSION['carrello'] = [];
-                $success = "Ordine confermato! Il carrello è stato svuotato.";
+                try {
+                    // Calcola il totale dell'ordine
+                    $totale_ordine = 0;
+                    foreach ($_SESSION['carrello'] as $item) {
+                        $totale_ordine += $item['prezzo'] * $item['quantita'];
+                    }
+
+                    // Inizia la transazione
+                    $conn->beginTransaction();
+
+                    // Ottieni i dati dell'utente
+                    $stmt = $conn->prepare("SELECT username, email FROM users WHERE id = :user_id");
+                    $stmt->execute([':user_id' => $_SESSION['user_id']]);
+                    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                    // Verifica se esiste già un cliente con questa email
+                    $stmt = $conn->prepare("SELECT id FROM clienti WHERE email = :email");
+                    $stmt->execute([':email' => $user['email']]);
+                    $cliente = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                    if ($cliente) {
+                        // Se il cliente esiste, usa il suo ID
+                        $cliente_id = $cliente['id'];
+                    } else {
+                        // Se il cliente non esiste, crea un nuovo record
+                        $stmt = $conn->prepare("INSERT INTO clienti (nome, cognome, email, data_registrazione) 
+                                             VALUES (:nome, :cognome, :email, NOW())");
+                        $stmt->execute([
+                            ':nome' => $user['username'],
+                            ':cognome' => '',
+                            ':email' => $user['email']
+                        ]);
+                        $cliente_id = $conn->lastInsertId();
+                    }
+
+                    // Crea l'ordine
+                    $stmt = $conn->prepare("INSERT INTO ordini (cliente_id, data_ordine, totale) VALUES (:cliente_id, NOW(), :totale)");
+                    $stmt->execute([
+                        ':cliente_id' => $cliente_id,
+                        ':totale' => $totale_ordine
+                    ]);
+                    $ordine_id = $conn->lastInsertId();
+
+                    // Aggiungi i dettagli dell'ordine
+                    $stmt = $conn->prepare("INSERT INTO dettagli_ordine (ordine_id, prodotto_id, quantita, prezzo_unitario) VALUES (:ordine_id, :prodotto_id, :quantita, :prezzo)");
+                    foreach ($_SESSION['carrello'] as $prodotto_id => $item) {
+                        $stmt->execute([
+                            ':ordine_id' => $ordine_id,
+                            ':prodotto_id' => $prodotto_id,
+                            ':quantita' => $item['quantita'],
+                            ':prezzo' => $item['prezzo']
+                        ]);
+
+                        // Aggiorna la quantità disponibile nel magazzino
+                        $stmt_update = $conn->prepare("UPDATE prodotti SET quantita_disponibile = quantita_disponibile - :quantita WHERE id = :prodotto_id");
+                        $stmt_update->execute([
+                            ':quantita' => $item['quantita'],
+                            ':prodotto_id' => $prodotto_id
+                        ]);
+                    }
+
+                    // Aggiungi il movimento contabile
+                    $stmt = $conn->prepare("INSERT INTO movimenti_contabili (tipo, importo, descrizione, riferimento_ordine) VALUES ('entrata', :importo, :descrizione, :ordine_id)");
+                    $stmt->execute([
+                        ':importo' => $totale_ordine,
+                        ':descrizione' => "Vendita Ordine",
+                        ':ordine_id' => $ordine_id
+                    ]);
+
+                    // Conferma la transazione
+                    $conn->commit();
+
+                    // Svuota il carrello
+                    $_SESSION['carrello'] = [];
+                    $success = "Ordine confermato con successo! Il carrello è stato svuotato.";
+                } catch (PDOException $e) {
+                    // In caso di errore, annulla la transazione
+                    $conn->rollBack();
+                    $error = "Errore durante la conferma dell'ordine: " . $e->getMessage();
+                }
                 break;
         }
     }
@@ -60,7 +138,7 @@ foreach ($_SESSION['carrello'] as $item) {
             border-bottom: 1px solid #ddd;
         }
         .cart-item:last-child {
-            border-bottom: none;
+            border-bottom: none;a
         }
         .cart-total {
             text-align: right;
@@ -77,12 +155,19 @@ foreach ($_SESSION['carrello'] as $item) {
                 <img src="../../content/logo.png" alt="Logo Sistema ERP" class="logo-img">
             </div>
             <ul class="menu">
-                <li><a href="../../index.php">Home</a></li>
-                <li><a href="../contabilita/index.php">Contabilità</a></li>
-                <li><a href="../magazzino/index.php">Magazzino</a></li>
-                <li><a href="../clienti/index.php">Clienti</a></li>
-                <li><a href="../fornitori/index.php">Fornitori</a></li>
-                <li><a href="prodotti.php">Prodotti</a></li>
+            <li><a href="../../index.php">Home</a></li>
+
+                <?php if ($_SESSION['role'] === 'admin'): ?>
+                    <li><a href="../contabilita/index.php">Contabilità</a></li>
+                    <li><a href="../magazzino/index.php">Magazzino</a></li>
+                    <li><a href="../clienti/index.php">Clienti</a></li>
+                    <li><a href="../fornitori/index.php">Fornitori</a></li>
+                <?php endif; ?>
+                <?php if ($_SESSION['role'] === 'user'): ?>
+                    <li><a href="../ordini/prodotti.php">Prodotti</a></li>
+                    <li><a href="../ordini/carrello.php">Carrello</a></li>
+                <?php endif; ?>
+                <li><a href="../../logout.php">Logout</a></li>
             </ul>
         </nav>
     </header>
